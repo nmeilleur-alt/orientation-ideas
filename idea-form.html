@@ -117,6 +117,7 @@
     if (ideas.length === 0) {
       msgEl.textContent = "Please enter at least one idea. / Veuillez entrer au moins une idée.";
       msgEl.className = "msg error";
+      msgEl.style.display = "block";
       return;
     }
     const btn = document.getElementById("submit-btn");
@@ -127,10 +128,12 @@
       await fetch(url, { mode: "no-cors" });
       msgEl.textContent = "✓ " + ideas.length + " idea" + (ideas.length > 1 ? "s" : "") + " submitted — thank you! / Merci!";
       msgEl.className = "msg success";
+      msgEl.style.display = "block";
       resetForm();
     } catch (err) {
       msgEl.textContent = "Something went wrong. Please try again. / Une erreur s'est produite.";
       msgEl.className = "msg error";
+      msgEl.style.display = "block";
     }
     btn.disabled = false;
     btn.textContent = "Submit / Soumettre";

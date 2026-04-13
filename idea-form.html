@@ -3,75 +3,101 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Share Your Ideas</title>
+  <title>Orientation Ideas — Laurentian University</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: transparent; padding: 10px 12px; }
-    h1 { font-size: 16px; font-weight: 600; color: #1a237e; margin-bottom: 2px; }
-    .sub { font-size: 12px; color: #999; margin-bottom: 10px; }
-    .idea-row { display: flex; gap: 6px; margin-bottom: 7px; align-items: center; }
-    .idea-row input { flex: 1; border: 1px solid #ddd; border-radius: 7px; padding: 8px 11px; font-size: 14px; outline: none; background: #fff; min-width: 0; }
-    .idea-row input:focus { border-color: #4f5b9d; }
-    .remove-btn { background: none; border: none; cursor: pointer; color: #ccc; font-size: 20px; padding: 0 4px; line-height: 1; flex-shrink: 0; }
-    .remove-btn:hover { color: #e74c3c; }
-    .add-btn { width: 100%; background: none; border: 1.5px dashed #ddd; color: #999; font-size: 13px; padding: 7px; border-radius: 7px; cursor: pointer; margin: 2px 0 10px; font-family: inherit; }
-    .add-btn:hover { border-color: #aaa; color: #555; }
-    .submit-btn { width: 100%; background: #4f5b9d; color: #fff; border: none; padding: 10px; border-radius: 7px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit; }
-    .submit-btn:hover { background: #394377; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f0f4f8; min-height: 100vh; padding: 24px 16px 48px; }
+    .form-card { max-width: 560px; margin: 0 auto; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.08); }
+
+    .hero { position: relative; height: 180px; overflow: hidden; border-top: 6px solid #FFB81C; }
+    .hero img { width: 100%; height: 100%; object-fit: cover; object-position: center 40%; display: block; }
+    .hero-overlay { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(0,32,96,0.3) 0%, rgba(0,32,96,0.72) 100%); }
+    .hero-text { position: absolute; bottom: 18px; left: 22px; right: 22px; }
+    .hero-text h1 { color: #fff; font-size: 19px; font-weight: 700; text-shadow: 0 1px 4px rgba(0,0,0,0.5); margin-bottom: 4px; }
+    .hero-text p { color: rgba(255,255,255,0.82); font-size: 12px; text-shadow: 0 1px 2px rgba(0,0,0,0.4); }
+
+    .body { padding: 24px 28px 28px; }
+    .notice { background: #fff8e1; border-left: 4px solid #FFB81C; border-radius: 0 6px 6px 0; padding: 10px 14px; font-size: 13px; color: #5a4000; margin-bottom: 20px; line-height: 1.5; }
+    .notice strong { font-weight: 600; }
+    label { display: block; font-size: 13px; font-weight: 600; color: #333; margin-bottom: 8px; }
+    .idea-row { display: flex; gap: 8px; margin-bottom: 8px; align-items: center; }
+    .idea-row input { flex: 1; border: 1px solid #dadce0; border-radius: 4px; padding: 10px 12px; font-size: 14px; color: #202124; font-family: inherit; outline: none; transition: border-color 0.15s, box-shadow 0.15s; min-width: 0; background: #fff; }
+    .idea-row input:focus { border-color: #002060; box-shadow: 0 0 0 2px rgba(0,32,96,0.15); }
+    .remove-btn { background: none; border: none; cursor: pointer; color: #bbb; font-size: 20px; padding: 0 4px; line-height: 1; flex-shrink: 0; border-radius: 4px; }
+    .remove-btn:hover { color: #d93025; background: #fce8e6; }
+    .add-btn { display: flex; align-items: center; gap: 6px; background: none; border: none; color: #002060; font-size: 13px; font-weight: 600; padding: 8px 4px; cursor: pointer; font-family: inherit; margin: 4px 0 20px; }
+    .add-btn:hover { color: #c8960a; }
+    .add-btn::before { content: '+'; font-size: 18px; font-weight: 400; }
+    .submit-btn { width: 100%; background: #002060; color: #fff; border: none; padding: 12px; border-radius: 4px; font-size: 15px; font-weight: 600; cursor: pointer; font-family: inherit; transition: background 0.2s; }
+    .submit-btn:hover { background: #003080; }
     .submit-btn:disabled { background: #aaa; cursor: not-allowed; }
-    .msg { margin-top: 8px; font-size: 12px; text-align: center; padding: 8px; border-radius: 7px; display: none; }
-    .msg.success { background: #eaf3de; color: #3b6d11; display: block; }
-    .msg.error { background: #fdf0f0; color: #c0392b; display: block; }
+    .msg { margin-top: 12px; font-size: 13px; text-align: center; padding: 10px 14px; border-radius: 4px; display: none; line-height: 1.5; }
+    .msg.success { background: #e6f4ea; color: #137333; border: 1px solid #ceead6; display: block; }
+    .msg.error { background: #fce8e6; color: #c5221f; border: 1px solid #f5c6c4; display: block; }
+    .footer { background: #002060; padding: 12px 28px; font-size: 11px; color: rgba(255,255,255,0.55); text-align: center; letter-spacing: 0.02em; }
+
+    @media (max-width: 480px) {
+      body { padding: 0; background: #fff; }
+      .form-card { box-shadow: none; border-radius: 0; min-height: 100vh; }
+      .body { padding: 20px 20px 24px; }
+    }
   </style>
 </head>
 <body>
-  <h1>Share your ideas</h1>
-  <p class="sub">Press Enter to add a new field</p>
-  <div id="ideas-container">
-    <div class="idea-row">
-      <input type="text" placeholder="Type an idea..." class="idea-input" />
-      <button class="remove-btn" onclick="removeRow(this)">×</button>
+  <div class="form-card">
+
+    <div class="hero">
+      <img src="https://laurentian.ca/sites/default/files/styles/hero_banner_full_large/public/2025-08/LU-Campus-2400x1200.webp?h=df51affa&itok=yU6WyJWR" alt="Laurentian University campus" />
+      <div class="hero-overlay"></div>
+      <div class="hero-text">
+        <h1>Orientation Ideas / Idées pour l'orientation</h1>
+        <p>Laurentian University · Université Laurentienne · Student Services</p>
+      </div>
     </div>
+
+    <div class="body">
+      <div class="notice">
+        <strong>Your responses are anonymous.</strong> This form is run by Laurentian Student Services and connects directly to a secure spreadsheet. No personal information is collected.<br><br>
+        <strong>Vos réponses sont anonymes.</strong> Ce formulaire est géré par les Services aux étudiants et ne recueille aucune information personnelle.
+      </div>
+
+      <label>Your ideas — one per field / Vos idées — une par champ</label>
+
+      <div id="ideas-container">
+        <div class="idea-row">
+          <input type="text" placeholder="Type an idea... / Entrez une idée..." class="idea-input" />
+          <button class="remove-btn" onclick="removeRow(this)" aria-label="Remove">×</button>
+        </div>
+      </div>
+
+      <button class="add-btn" onclick="addRow()">Add another idea / Ajouter une idée</button>
+      <button class="submit-btn" id="submit-btn" onclick="submitIdeas()">Submit / Soumettre</button>
+      <div class="msg" id="msg"></div>
+    </div>
+
+    <div class="footer">
+      LAURENTIAN UNIVERSITY · UNIVERSITÉ LAURENTIENNE · SUDBURY, ONTARIO · LAURENTIAN.CA
+    </div>
+
   </div>
-  <button class="add-btn" onclick="addRow()">+ Add another idea</button>
-  <button class="submit-btn" id="submit-btn" onclick="submitIdeas()">Submit ideas</button>
-  <div class="msg" id="msg"></div>
 
 <script>
   const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby-g-9r1IegrTiUjH_Ip8sCvfbzobFR6gwSSW09-do6-cWZZyevm3GRmQwX8PJTbTbaUg/exec";
-
-  function reportHeight() {
-    const h = document.documentElement.scrollHeight || document.body.scrollHeight;
-    window.parent.postMessage({ type: "setHeight", height: h }, "*");
-    window.parent.postMessage({ height: h }, "*");
-    window.parent.postMessage(JSON.stringify({ type: "resize", height: h }), "*");
-    window.parent.postMessage(JSON.stringify({ height: h }), "*");
-  }
-
-  window.addEventListener("load", function() {
-    reportHeight();
-    setTimeout(reportHeight, 200);
-    setTimeout(reportHeight, 500);
-  });
-
-  new ResizeObserver(reportHeight).observe(document.body);
 
   function addRow() {
     const container = document.getElementById("ideas-container");
     const row = document.createElement("div");
     row.className = "idea-row";
-    row.innerHTML = '<input type="text" placeholder="Type an idea..." class="idea-input" /><button class="remove-btn" onclick="removeRow(this)">×</button>';
+    row.innerHTML = '<input type="text" placeholder="Type an idea... / Entrez une idée..." class="idea-input" /><button class="remove-btn" onclick="removeRow(this)" aria-label="Remove">×</button>';
     container.appendChild(row);
     const input = row.querySelector("input");
     input.focus();
     input.addEventListener("keydown", function(e) { if (e.key === "Enter") { e.preventDefault(); addRow(); } });
-    setTimeout(reportHeight, 100);
   }
 
   function removeRow(btn) {
     if (document.querySelectorAll(".idea-row").length === 1) return;
     btn.parentElement.remove();
-    setTimeout(reportHeight, 100);
   }
 
   document.querySelector(".idea-input").addEventListener("keydown", function(e) {
@@ -79,9 +105,8 @@
   });
 
   function resetForm() {
-    document.getElementById("ideas-container").innerHTML = '<div class="idea-row"><input type="text" placeholder="Type an idea..." class="idea-input" /><button class="remove-btn" onclick="removeRow(this)">×</button></div>';
+    document.getElementById("ideas-container").innerHTML = '<div class="idea-row"><input type="text" placeholder="Type an idea... / Entrez une idée..." class="idea-input" /><button class="remove-btn" onclick="removeRow(this)" aria-label="Remove">×</button></div>';
     document.querySelector(".idea-input").addEventListener("keydown", function(e) { if (e.key === "Enter") { e.preventDefault(); addRow(); } });
-    setTimeout(reportHeight, 100);
   }
 
   async function submitIdeas() {
@@ -89,23 +114,26 @@
     const msgEl = document.getElementById("msg");
     msgEl.className = "msg";
     msgEl.style.display = "none";
-    if (ideas.length === 0) { msgEl.textContent = "Please enter at least one idea."; msgEl.className = "msg error"; setTimeout(reportHeight, 50); return; }
+    if (ideas.length === 0) {
+      msgEl.textContent = "Please enter at least one idea. / Veuillez entrer au moins une idée.";
+      msgEl.className = "msg error";
+      return;
+    }
     const btn = document.getElementById("submit-btn");
     btn.disabled = true;
-    btn.textContent = "Submitting...";
+    btn.textContent = "Submitting... / Envoi en cours...";
     try {
       const url = APPS_SCRIPT_URL + "?ideas=" + encodeURIComponent(ideas.join("||"));
       await fetch(url, { mode: "no-cors" });
-      msgEl.textContent = ideas.length + " idea" + (ideas.length > 1 ? "s" : "") + " submitted — thanks!";
+      msgEl.textContent = "✓ " + ideas.length + " idea" + (ideas.length > 1 ? "s" : "") + " submitted — thank you! / Merci!";
       msgEl.className = "msg success";
       resetForm();
     } catch (err) {
-      msgEl.textContent = "Something went wrong. Please try again.";
+      msgEl.textContent = "Something went wrong. Please try again. / Une erreur s'est produite.";
       msgEl.className = "msg error";
     }
     btn.disabled = false;
-    btn.textContent = "Submit ideas";
-    setTimeout(reportHeight, 50);
+    btn.textContent = "Submit / Soumettre";
   }
 </script>
 </body>

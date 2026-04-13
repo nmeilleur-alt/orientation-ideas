@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Share Your Ideas</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: transparent; padding: 10px 12px; }
+    h1 { font-size: 16px; font-weight: 600; color: #1a237e; margin-bottom: 2px; }
+    .sub { font-size: 12px; color: #999; margin-bottom: 10px; }
+    .idea-row { display: flex; gap: 6px; margin-bottom: 7px; align-items: center; }
+    .idea-row input { flex: 1; border: 1px solid #ddd; border-radius: 7px; padding: 8px 11px; font-size: 14px; outline: none; background: #fff; min-width: 0; }
+    .idea-row input:focus { border-color: #4f5b9d; }
+    .remove-btn { background: none; border: none; cursor: pointer; color: #ccc; font-size: 20px; padding: 0 4px; line-height: 1; flex-shrink: 0; }
+    .remove-btn:hover { color: #e74c3c; }
+    .add-btn { width: 100%; background: none; border: 1.5px dashed #ddd; color: #999; font-size: 13px; padding: 7px; border-radius: 7px; cursor: pointer; margin: 2px 0 10px; font-family: inherit; }
+    .add-btn:hover { border-color: #aaa; color: #555; }
+    .submit-btn { width: 100%; background: #4f5b9d; color: #fff; border: none; padding: 10px; border-radius: 7px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit; }
+    .submit-btn:hover { background: #394377; }
+    .submit-btn:disabled { background: #aaa; cursor: not-allowed; }
+    .msg { margin-top: 8px; font-size: 12px; text-align: center; padding: 8px; border-radius: 7px; display: none; }
+    .msg.success { background: #eaf3de; color: #3b6d11; display: block; }
+    .msg.error { background: #fdf0f0; color: #c0392b; display: block; }
+  </style>
+</head>
+<body>
+  <h1>Share your ideas</h1>
+  <p class="sub">Press Enter to add a new field</p>
+  <div id="ideas-container">
+    <div class="idea-row">
+      <input type="text" placeholder="Type an idea..." class="idea-input" />
+      <button class="remove-btn" onclick="removeRow(this)">×</button>
+    </div>
+  </div>
+  <button class="add-btn" onclick="addRow()">+ Add another idea</button>
+  <button class="submit-btn" id="submit-btn" onclick="submitIdeas()">Submit ideas</button>
+  <div class="msg" id="msg"></div>
+
+<script>
+  const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby-g-9r1IegrTiUjH_Ip8sCvfbzobFR6gwSSW09-do6-cWZZyevm3GRmQwX8PJTbTbaUg/exec";
+
+  function reportHeight() {
+    const h = document.documentElement.scrollHeight || document.body.scrollHeight;
+    window.parent.postMessage({ type: "setHeight", height: h }, "*");
+    window.parent.postMessage({ height: h }, "*");
+    window.parent.postMessage(JSON.stringify({ type: "resize", height: h }), "*");
+    window.parent.postMessage(JSON.stringify({ height: h }), "*");
+  }
+
+  window.addEventListener("load", function() {
+    reportHeight();
+    setTimeout(reportHeight, 200);
+    setTimeout(reportHeight, 500);
+  });
+
+  new ResizeObserver(reportHeight).observe(document.body);
+
+  function addRow() {
+    const container = document.getElementById("ideas-container");
+    const row = document.createElement("div");
+    row.className = "idea-row";
+    row.innerHTML = '<input type="text" placeholder="Type an idea..." class="idea-input" /><button class="remove-btn" onclick="removeRow(this)">×</button>';
+    container.appendChild(row);
+    const input = row.querySelector("input");
+    input.focus();
+    input.addEventListener("keydown", function(e) { if (e.key === "Enter") { e.preventDefault(); addRow(); } });
+    setTimeout(reportHeight, 100);
+  }
+
+  function removeRow(btn) {
+    if (document.querySelectorAll(".idea-row").length === 1) return;
+    btn.parentElement.remove();
+    setTimeout(reportHeight, 100);
+  }
+
+  document.querySelector(".idea-input").addEventListener("keydown", function(e) {
+    if (e.key === "Enter") { e.preventDefault(); addRow(); }
+  });
+
+  function resetForm() {
+    document.getElementById("ideas-container").innerHTML = '<div class="idea-row"><input type="text" placeholder="Type an idea..." class="idea-input" /><button class="remove-btn" onclick="removeRow(this)">×</button></div>';
+    document.querySelector(".idea-input").addEventListener("keydown", function(e) { if (e.key === "Enter") { e.preventDefault(); addRow(); } });
+    setTimeout(reportHeight, 100);
+  }
+
+  async function submitIdeas() {
+    const ideas = Array.from(document.querySelectorAll(".idea-input")).map(function(i) { return i.value.trim(); }).filter(function(i) { return i !== ""; });
+    const msgEl = document.getElementById("msg");
+    msgEl.className = "msg";
+    msgEl.style.display = "none";
+    if (ideas.length === 0) { msgEl.textContent = "Please enter at least one idea."; msgEl.className = "msg error"; setTimeout(reportHeight, 50); return; }
+    const btn = document.getElementById("submit-btn");
+    btn.disabled = true;
+    btn.textContent = "Submitting...";
+    try {
+      const url = APPS_SCRIPT_URL + "?ideas=" + encodeURIComponent(ideas.join("||"));
+      await fetch(url, { mode: "no-cors" });
+      msgEl.textContent = ideas.length + " idea" + (ideas.length > 1 ? "s" : "") + " submitted — thanks!";
+      msgEl.className = "msg success";
+      resetForm();
+    } catch (err) {
+      msgEl.textContent = "Something went wrong. Please try again.";
+      msgEl.className = "msg error";
+    }
+    btn.disabled = false;
+    btn.textContent = "Submit ideas";
+    setTimeout(reportHeight, 50);
+  }
+</script>
+</body>
+</html>
